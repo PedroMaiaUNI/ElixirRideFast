@@ -1,0 +1,29 @@
+defmodule RideFast.Rides.Ride do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "rides" do
+    field :origin_lat, :float
+    field :origin_lng, :float
+    field :dest_lat, :float
+    field :dest_lng, :float
+    field :price_estimate, :decimal
+    field :final_price, :decimal
+    field :status, :string
+    field :requested_at, :naive_datetime
+    field :started_at, :naive_datetime
+    field :ended_at, :naive_datetime
+    field :user_id, :id
+    field :driver_id, :id
+    field :vehicle_id, :id
+
+    timestamps(type: :utc_datetime)
+  end
+
+  @doc false
+  def changeset(ride, attrs) do
+    ride
+    |> cast(attrs, [:origin_lat, :origin_lng, :dest_lat, :dest_lng, :price_estimate, :final_price, :status, :requested_at, :started_at, :ended_at])
+    |> validate_required([:origin_lat, :origin_lng, :dest_lat, :dest_lng, :price_estimate, :final_price, :status, :requested_at, :started_at, :ended_at])
+  end
+end
