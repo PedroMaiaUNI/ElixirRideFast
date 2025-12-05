@@ -1,5 +1,5 @@
 defmodule RideFastWeb.VehicleJSON do
-  alias RideFast.Fleet.Vehicle
+  alias RideFast.Vehicles.Vehicle
 
   @doc """
   Renders a list of vehicles.

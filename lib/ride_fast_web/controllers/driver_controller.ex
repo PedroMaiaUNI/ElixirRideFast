@@ -25,7 +25,7 @@ defmodule RideFastWeb.DriverController do
     render(conn, :show, driver: driver)
   end
 
-  def update(conn, %{"id" => id, "driver" => driver_params}) do
+  def update(conn, %{"id" => id} = driver_params) do
     driver = Accounts.get_driver!(id)
 
     with {:ok, %Driver{} = driver} <- Accounts.update_driver(driver, driver_params) do

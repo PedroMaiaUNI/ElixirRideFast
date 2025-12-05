@@ -7,6 +7,7 @@ defmodule RideFast.Skills do
   alias RideFast.Repo
 
   alias RideFast.Skills.Language
+  alias RideFast.Skills.DriversLanguage
 
   @doc """
   Returns the list of languages.
@@ -101,4 +102,30 @@ defmodule RideFast.Skills do
   def change_language(%Language{} = language, attrs \\ %{}) do
     Language.changeset(language, attrs)
   end
+
+  # POST /api/v1/drivers/{driver_id}/languages/{language_id}
+  def associate_language(attrs) do
+    %DriversLanguage{}
+    |> DriversLanguage.changeset(attrs)
+    |> Repo.insert(on_conflict: :nothing)
+  end
+
+  # DELETE /api/v1/drivers/{driver_id}/languages/{language_id}
+  def disassociate_language(driver_id, language_id) do
+    DriversLanguage
+    |> Repo.get_by(driver_id: driver_id, language_id: language_id)
+    |> case do
+      nil -> {:error, :not_found}
+      dl -> Repo.delete(dl)
+    end
+  end
+
+  def list_driver_languages(driver_id) do
+    DriversLanguage
+    |> join(:inner, [dl], l in assoc(dl, :language))
+    |> where([dl, l], dl.driver_id == ^driver_id)
+    |> select([dl, l], l)
+    |> Repo.all()
+  end
+
 end

@@ -1,4 +1,4 @@
-defmodule RideFast.Fleet.Vehicle do
+defmodule RideFast.Vehicles.Vehicle do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,8 @@ defmodule RideFast.Fleet.Vehicle do
     field :color, :string
     field :seats, :integer
     field :active, :boolean, default: false
-    field :driver_id, :id
+
+    belongs_to :driver, RideFast.Accounts.Driver
 
     timestamps(type: :utc_datetime)
   end
@@ -16,7 +17,8 @@ defmodule RideFast.Fleet.Vehicle do
   @doc false
   def changeset(vehicle, attrs) do
     vehicle
-    |> cast(attrs, [:plate, :model, :color, :seats, :active])
-    |> validate_required([:plate, :model, :color, :seats, :active])
+    |> cast(attrs, [:driver_id, :plate, :model, :color, :seats, :active])
+    |> validate_required([:driver_id, :plate, :model, :color, :seats, :active])
+    |> foreign_key_constraint(:driver_id)
   end
 end

@@ -12,19 +12,36 @@ defmodule RideFastWeb.RatingController do
     render(conn, :index, ratings: ratings)
   end
 
-  def create(conn, %{"rating" => rating_params}) do
+  # GET /api/v1/drivers/:driver_id/ratings
+  def index_by_driver(conn, %{"driver_id" => driver_id}) do
+    ratings = RideFast.Ratings.list_ratings_by_driver(driver_id)
+    render(conn, :index, ratings: ratings)
+  end
+
+  def get_current_user_id(conn) do
+      # conn.assigns[:current_user].id
+      conn.assigns[:user_id]
+  end
+
+  def create(conn, %{"ride_id" => ride_id} = params) do
     #   with {:ok, %Rating{} = rating} <- Ratings.create_rating(rating_params) do
     #   conn
     #   |> put_status(:created)
     #   |> put_resp_header("location", ~p"/api/ratings/#{rating}")
     #   |> render(:show, rating: rating)
 
-    ride_id = rating_params["ride_id"]
+    current_user = Guardian.Plug.current_resource(conn)
 
     ride = Rides.get_ride!(ride_id)
 
     if ride.status == "FINALIZADA" do
-      with {:ok, %Rating{} = rating} <- Social.create_rating(rating_params) do
+      rating_params =
+          params
+          |> Map.put("from_user_id", current_user.id)
+          |> Map.put("to_driver_id", ride.driver_id)
+          |> Map.put("ride_id", ride.id)
+
+      with {:ok, %RideFast.Ratings.Rating{} = rating} <- Ratings.create_rating(rating_params) do
         conn
         |> put_status(:created)
         |> put_resp_header("location", ~p"/api/v1/ratings/#{rating}")
@@ -43,7 +60,7 @@ defmodule RideFastWeb.RatingController do
     render(conn, :show, rating: rating)
   end
 
-  def update(conn, %{"id" => id, "rating" => rating_params}) do
+  def update(conn, %{"id" => id} = rating_params) do
     rating = Ratings.get_rating!(id)
 
     with {:ok, %Rating{} = rating} <- Ratings.update_rating(rating, rating_params) do

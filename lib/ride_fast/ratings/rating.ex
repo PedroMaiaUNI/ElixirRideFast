@@ -5,9 +5,10 @@ defmodule RideFast.Ratings.Rating do
   schema "ratings" do
     field :score, :integer
     field :comment, :string
-    field :ride_id, :id
-    field :from_user_id, :id
-    field :to_driver_id, :id
+
+    belongs_to :driver, RideFast.Accounts.Driver, foreign_key: :to_driver_id
+    belongs_to :user, RideFast.Accounts.User, foreign_key: :from_user_id
+    belongs_to :ride, RideFast.Rides.Ride, foreign_key: :ride_id
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +16,8 @@ defmodule RideFast.Ratings.Rating do
   @doc false
   def changeset(rating, attrs) do
     rating
-    |> cast(attrs, [:score, :comment])
-    |> validate_required([:score, :comment])
+    |> cast(attrs, [:score, :comment, :to_driver_id, :from_user_id, :ride_id])
+    |> validate_required([:score, :comment, :to_driver_id, :from_user_id])
+    |> validate_inclusion(:score, 1..5)
   end
 end

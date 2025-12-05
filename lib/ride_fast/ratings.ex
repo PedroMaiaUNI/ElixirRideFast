@@ -101,4 +101,11 @@ defmodule RideFast.Ratings do
   def change_rating(%Rating{} = rating, attrs \\ %{}) do
     Rating.changeset(rating, attrs)
   end
+
+  def list_ratings_by_driver(driver_id) do
+    import Ecto.Query
+    Rating
+    |> where([r], r.to_driver_id == ^driver_id)
+    |> Repo.all()
+  end
 end

@@ -1,12 +1,12 @@
-defmodule RideFast.Fleet do
+defmodule RideFast.Vehicles do
   @moduledoc """
-  The Fleet context.
+  The Vehicles context.
   """
 
   import Ecto.Query, warn: false
   alias RideFast.Repo
 
-  alias RideFast.Fleet.Vehicle
+  alias RideFast.Vehicles.Vehicle
 
   @doc """
   Returns the list of vehicles.

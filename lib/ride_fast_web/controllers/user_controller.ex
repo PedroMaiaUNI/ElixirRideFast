@@ -11,7 +11,7 @@ defmodule RideFastWeb.UserController do
     render(conn, :index, users: users)
   end
 
-  def create(conn, %{"user" => user_params}) do
+  def create(conn, user_params) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
       |> put_status(:created)
@@ -25,7 +25,7 @@ defmodule RideFastWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
+  def update(conn, %{"id" => id} = user_params) do
     user = Accounts.get_user!(id)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do

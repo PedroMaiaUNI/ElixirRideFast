@@ -36,6 +36,15 @@ defmodule RideFastWeb.Router do
       get "/profile", DriverProfileController, :show
       post "/profile", DriverProfileController, :create
       put "/profile", DriverProfileController, :update
+      get "/ratings", RatingController, :index_by_driver
+
+      # GET /drivers/:driver_id/languages
+      get "/languages", LanguageController, :index_driver
+      # POST /drivers/:driver_id/languages
+      post "/languages", LanguageController, :associate
+      # DELETE /drivers/:driver_id/languages/:id
+      delete "/languages/:language_id", LanguageController, :disassociate
+
     end
 
     resources "/vehicles", VehicleController, only: [:update, :delete]
@@ -44,9 +53,33 @@ defmodule RideFastWeb.Router do
     post "/rides/:id/accept", RideController, :accept
     post "/rides/:id/start", RideController, :start
     post "/rides/:id/complete", RideController, :complete
+    post "/rides/:id/cancel", RideController, :cancel
+
+    post "/rides/:ride_id/ratings", RatingController, :create
 
 
     resources "/ratings", RatingController, except: [:new, :edit]
+  end
+
+  #ROTAS ADMIN
+
+  pipeline :admin_check do
+    plug RideFastWeb.Plugs.RequireAdmin
+  end
+
+  scope "/api/v1", RideFastWeb do
+    pipe_through [:api, RideFast.AuthPipeline]
+
+    resources "/rides", RideController, except: [:new, :edit]
+    resources "/languages", LanguageController, only: [:index, :show]
+
+    scope "/" do
+      pipe_through :admin_check
+
+      get "/users", UserController, :index
+      post "/languages", LanguageController, :create
+
+    end
   end
 
   # Enable Swoosh mailbox preview in development

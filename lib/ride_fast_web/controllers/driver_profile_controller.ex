@@ -25,29 +25,44 @@ defmodule RideFastWeb.DriverProfileController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"driver_id" => driver_id}) do
     # driver_profile = Accounts.get_driver_profile!(id)
     # render(conn, :show, driver_profile: driver_profile)
 
-    case Accounts.get_driver_profile_by_driver_id(id) do
-      nil ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{error: "Profile not found"})
-      profile ->
-        json(conn, %{
-          license_number: profile.license_number,
-          license_expiry: profile.license_expiry,
-          background_check_ok: profile.background_check_ok
-        })
+    profile = Accounts.get_driver_profile_by_driver_id(driver_id)
+
+    if profile do
+      json(conn, %{
+        driver_id: profile.driver_id,
+        license_number: profile.license_number,
+        license_expiry: profile.license_expiry,
+        background_check_ok: profile.background_check_ok
+      })
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Perfil não encontrado."})
     end
   end
 
-  def update(conn, %{"id" => id, "driver_profile" => driver_profile_params}) do
+  def update(conn, %{"driver_id" => id} = driver_profile_params) do
     driver_profile = Accounts.get_driver_profile!(id)
 
-    with {:ok, %DriverProfile{} = driver_profile} <- Accounts.update_driver_profile(driver_profile, driver_profile_params) do
-      render(conn, :show, driver_profile: driver_profile)
+    profile = Accounts.get_driver_profile_by_driver_id(id)
+
+    if profile do
+      with {:ok, %DriverProfile{} = updated_profile} <- Accounts.update_driver_profile(profile, driver_profile_params) do
+        json(conn, %{
+          driver_id: updated_profile.driver_id,
+          license_number: updated_profile.license_number,
+          license_expiry: updated_profile.license_expiry,
+          background_check_ok: updated_profile.background_check_ok
+        })
+      end
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Perfil não encontrado"})
     end
   end
 

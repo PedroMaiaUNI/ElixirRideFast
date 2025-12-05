@@ -107,11 +107,11 @@ defmodule RideFast.Rides do
     Repo.get!(Ride, id) |> Repo.preload([:user, :driver, :vehicle])
   end
 
-  def accept_ride(%Ride{} = ride, driver_id, vehicle_id) do
+  def accept_ride(%Ride{id: id}, driver_id, vehicle_id) do
     Repo.transaction(fn ->
-      ride = Repo.query!("SELECT * FROM rides WHERE id = ? FOR UPDATE", [ride.id])
+      ride = Repo.query!("SELECT * FROM rides WHERE id = ? FOR UPDATE", [id])
 
-      ride = Repo.get!(Ride, ride.id)
+      ride = Repo.get!(Ride, id)
 
       if ride.status == "SOLICITADA" do
         attrs = %{
@@ -163,6 +163,16 @@ defmodule RideFast.Rides do
           final_price: final_price
         })
         |> Repo.update()
+    end
+  end
+
+  def cancel_ride(%Ride{} = ride) do
+    if ride.status in ["SOLICITADA", "ACEITA", "EM_ANDAMENTO"] do
+      ride
+      |> Ride.changeset(%{status: "CANCELADA"})
+      |> Repo.update()
+    else
+      {:error, "Não é possível cancelar uma corrida já terminada."}
     end
   end
 end

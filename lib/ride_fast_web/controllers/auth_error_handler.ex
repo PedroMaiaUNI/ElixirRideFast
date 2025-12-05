@@ -5,6 +5,6 @@ defmodule RideFastWeb.AuthErrorHandler do
   def auth_error(conn, {type, _reason}, _opts) do
     conn
     |> put_status(:unauthorized)
-    |> json(%{error: "Unauthorized", message: to_string(type)})
+    |> json(%{error: "NÃO AUTORIZADO.", message: to_string(type)})
   end
 end

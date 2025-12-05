@@ -5,6 +5,8 @@ defmodule RideFast.Repo.Migrations.CreateDriversLanguages do
     create table(:drivers_languages, primary_key: false) do
       add :driver_id, references(:drivers, on_delete: :delete_all), primary_key: true
       add :language_id, references(:languages, on_delete: :delete_all), primary_key: true
+
+      timestamps(type: :utc_datetime)
     end
 
     create index(:drivers_languages, [:driver_id])

@@ -14,20 +14,20 @@ defmodule RideFastWeb.AuthController do
         with {:ok, user} <- Accounts.create_user(params) do
           conn
           |> put_status(:created)
-          |> json(%{message: "User created successfully", id: user.id, email: user.email})
+          |> json(%{message: "Usuário criado com sucesso.", id: user.id, email: user.email})
         end
 
       "driver" ->
         with {:ok, driver} <- Accounts.create_driver(params) do
           conn
           |> put_status(:created)
-          |> json(%{message: "Driver created successfully", id: driver.id, email: driver.email})
+          |> json(%{message: "Motorista criado com sucesso.", id: driver.id, email: driver.email})
         end
 
       _ ->
         conn
         |> put_status(:bad_request)
-        |> json(%{error: "Invalid role. Must be 'user' or 'driver'."})
+        |> json(%{error: "Categoria Inválida. Deve ser 'Usuário' ou 'Motorista'."})
     end
   end
 
@@ -52,7 +52,7 @@ defmodule RideFastWeb.AuthController do
       {:error, :unauthorized} ->
         conn
         |> put_status(:unauthorized)
-        |> json(%{error: "Invalid email or password"})
+        |> json(%{error: "Email ou senha inválidos."})
     end
   end
 end

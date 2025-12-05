@@ -1,8 +1,8 @@
 defmodule RideFastWeb.LanguageControllerTest do
   use RideFastWeb.ConnCase
 
-  import RideFast.SkillsFixtures
-  alias RideFast.Skills.Language
+  import RideFast.LanguagesFixtures
+  alias RideFast.Languages.Language
 
   @create_attrs %{
     code: "some code",

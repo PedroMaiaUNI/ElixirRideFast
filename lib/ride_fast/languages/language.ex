@@ -1,4 +1,4 @@
-defmodule RideFast.Skills.Language do
+defmodule RideFast.Languages.Language do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -14,6 +14,5 @@ defmodule RideFast.Skills.Language do
     language
     |> cast(attrs, [:code, :name])
     |> validate_required([:code, :name])
-    |> unique_constraint(:code)
   end
 end

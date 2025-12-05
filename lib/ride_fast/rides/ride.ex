@@ -23,7 +23,7 @@ defmodule RideFast.Rides.Ride do
   @doc false
   def changeset(ride, attrs) do
     ride
-    |> cast(attrs, [:origin_lat, :origin_lng, :dest_lat, :dest_lng, :price_estimate, :final_price, :status, :requested_at, :started_at, :ended_at])
-    |> validate_required([:origin_lat, :origin_lng, :dest_lat, :dest_lng, :price_estimate, :final_price, :status, :requested_at, :started_at, :ended_at])
+    |> cast(attrs, [:user_id, :driver_id, :vehicle_id, :origin_lat, :origin_lng, :dest_lat, :dest_lng, :price_estimate, :final_price, :status, :requested_at, :started_at, :ended_at])
+    |> validate_required([:user_id, :origin_lat, :origin_lng, :dest_lat, :dest_lng, :status])
   end
 end

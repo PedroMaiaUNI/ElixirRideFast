@@ -1,45 +1,49 @@
 defmodule RideFastWeb.VehicleController do
   use RideFastWeb, :controller
 
-  alias RideFast.Fleet
-  alias RideFast.Fleet.Vehicle
+  alias RideFast.Vehicles
+  alias RideFast.Vehicles.Vehicle
 
   action_fallback RideFastWeb.FallbackController
 
-  def index(conn, _params) do
-    vehicles = Fleet.list_vehicles_by_driver() # GET /api/v1/drivers/:driver_id/vehicles
+  def index(conn, %{"driver_id" => driver_id}) do
+    vehicles = Vehicles.list_vehicles_by_driver(driver_id) # GET /api/v1/drivers/:driver_id/vehicles
     render(conn, :index, vehicles: vehicles)
   end
 
   # POST /api/v1/drivers/:driver_id/vehicles
-  def create(conn, %{"driver_id" => driver_id} = vehicle_params) do
-    params = Map.put(vehicle_params, "driver_id", driver_id)
+  def create(conn, %{"driver_id" => driver_id} = params) do
+    vehicle_params = Map.put(params, "driver_id", driver_id)
 
-    with {:ok, %Vehicle{} = vehicle} <- Fleet.create_vehicle(params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/vehicles/#{vehicle}")
-      |> render(:show, vehicle: vehicle)
+    case RideFast.Vehicles.create_vehicle(vehicle_params) do
+        {:ok, vehicle} ->
+            conn
+            |> put_status(:created)
+            |> render(:show, vehicle: vehicle)
+        {:error, %Ecto.Changeset{} = changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> render(RideFastWeb.ErrorJSON, :error, changeset: changeset)
     end
   end
 
   def show(conn, %{"id" => id}) do
-    vehicle = Fleet.get_vehicle!(id)
+    vehicle = Vehicles.get_vehicle!(id)
     render(conn, :show, vehicle: vehicle)
   end
 
-  def update(conn, %{"id" => id, "vehicle" => vehicle_params}) do
-    vehicle = Fleet.get_vehicle!(id)
+  def update(conn, %{"id" => id} = vehicle_params) do
+    vehicle = Vehicles.get_vehicle!(id)
 
-    with {:ok, %Vehicle{} = vehicle} <- Fleet.update_vehicle(vehicle, vehicle_params) do
+    with {:ok, %Vehicle{} = vehicle} <- Vehicles.update_vehicle(vehicle, vehicle_params) do
       render(conn, :show, vehicle: vehicle)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    vehicle = Fleet.get_vehicle!(id)
+    vehicle = Vehicles.get_vehicle!(id)
 
-    with {:ok, %Vehicle{}} <- Fleet.delete_vehicle(vehicle) do
+    with {:ok, %Vehicle{}} <- Vehicles.delete_vehicle(vehicle) do
       send_resp(conn, :no_content, "")
     end
   end

@@ -19,7 +19,11 @@ defmodule RideFastWeb.RatingJSON do
     %{
       id: rating.id,
       score: rating.score,
-      comment: rating.comment
+      comment: rating.comment,
+      #teste, remover depois:
+      to_driver_id: rating.to_driver_id,
+      from_user_id: rating.from_user_id,
+      ride_id: rating.ride_id
     }
   end
 end

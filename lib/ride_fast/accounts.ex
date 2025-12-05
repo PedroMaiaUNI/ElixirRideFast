@@ -150,7 +150,7 @@ defmodule RideFast.Accounts do
   """
   def create_driver(attrs) do
     %Driver{}
-    |> Driver.changeset(attrs)
+    |> Driver.create_changeset(attrs)
     |> Repo.insert()
   end
 
