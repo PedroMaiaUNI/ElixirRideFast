@@ -5,89 +5,77 @@ defmodule RideFastWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", RideFastWeb do
-    pipe_through :api
-
-    post "/auth/register", AuthController, :register
-    post "/auth/login", AuthController, :login
-
-    resources "/rides", RideController, except: [:new, :edit]
-    resources "/ratings", RatingController, except: [:new, :edit]
+  pipeline :auth do
+    plug RideFast.AuthPipeline
   end
-
-  scope "/api/v1", RideFastWeb do
-    pipe_through :api
-
-    #ROTAS PÚBLICAS
-    post "/auth/register", AuthController, :register
-    post "/auth/login", AuthController, :login
-  end
-
-  scope "/api/v1", RideFastWeb do
-    pipe_through [:api, RideFast.AuthPipeline]
-
-    #ROTAS PRIVADAS (JWT)
-
-    resources "/users", UserController, except: [:new, :edit]
-
-    resources "/drivers", DriverController, except: [:new, :edit] do
-      # /api/v1/drivers/:driver_id/vehicles
-      resources "/vehicles", VehicleController, only: [:index, :create]
-      get "/profile", DriverProfileController, :show
-      post "/profile", DriverProfileController, :create
-      put "/profile", DriverProfileController, :update
-      get "/ratings", RatingController, :index_by_driver
-
-      # GET /drivers/:driver_id/languages
-      get "/languages", LanguageController, :index_driver
-      # POST /drivers/:driver_id/languages
-      post "/languages", LanguageController, :associate
-      # DELETE /drivers/:driver_id/languages/:id
-      delete "/languages/:language_id", LanguageController, :disassociate
-
-    end
-
-    resources "/vehicles", VehicleController, only: [:update, :delete]
-
-    resources "/rides", RideController, except: [:new, :edit]
-    post "/rides/:id/accept", RideController, :accept
-    post "/rides/:id/start", RideController, :start
-    post "/rides/:id/complete", RideController, :complete
-    post "/rides/:id/cancel", RideController, :cancel
-
-    post "/rides/:ride_id/ratings", RatingController, :create
-
-
-    resources "/ratings", RatingController, except: [:new, :edit]
-  end
-
-  #ROTAS ADMIN
 
   pipeline :admin_check do
     plug RideFastWeb.Plugs.RequireAdmin
   end
 
+
+  # rotas públicas
+
   scope "/api/v1", RideFastWeb do
-    pipe_through [:api, RideFast.AuthPipeline]
+    pipe_through :api
 
-    resources "/rides", RideController, except: [:new, :edit]
-    resources "/languages", LanguageController, only: [:index, :show]
+    post "/auth/register", AuthController, :register
+    post "/auth/login", AuthController, :login
 
-    scope "/" do
-      pipe_through :admin_check
-
-      get "/users", UserController, :index
-      post "/languages", LanguageController, :create
-
-    end
+    resources "/languages", LanguageController, only: [:index]
   end
 
-  # Enable Swoosh mailbox preview in development
-  if Application.compile_env(:ride_fast, :dev_routes) do
+  # rotas AUTH (JWT)
 
+  scope "/api/v1", RideFastWeb do
+    pipe_through [:api, :auth]
+
+
+    resources "/users", UserController, only: [:show, :update, :delete]
+
+    resources "/drivers", DriverController, only: [:index, :show, :update, :delete] do
+
+      get "/profile", DriverProfileController, :show
+      post "/profile", DriverProfileController, :create
+      put "/profile", DriverProfileController, :update
+
+      resources "/vehicles", VehicleController, only: [:index, :create, :delete]
+
+      get "/languages", LanguageController, :index_driver
+      post "/languages", LanguageController, :associate
+      delete "/languages/:language_id", LanguageController, :disassociate
+
+      get "/ratings", RatingController, :index_by_driver
+    end
+
+    resources "/vehicles", VehicleController, only: [:update, :delete]
+
+    resources "/rides", RideController, only: [:create, :index, :show]
+
+    post "/rides/:id/accept", RideController, :accept
+    post "/rides/:id/start", RideController, :start
+    post "/rides/:id/complete", RideController, :complete
+    post "/rides/:id/cancel", RideController, :cancel
+    post "/rides/:ride_id/ratings", RatingController, :create
+  end
+
+  # rotas admin-only
+
+  scope "/api/v1", RideFastWeb do
+    pipe_through [:api, :auth, :admin_check]
+
+    resources "/users", UserController, only: [:index, :create, :delete]
+    resources "/drivers", DriverController, only: [:show, :create, :delete]
+
+    post "/users", UserController, :create
+    post "/drivers", DriverController, :create
+    post "/languages", LanguageController, :create
+
+  end
+
+  if Application.compile_env(:ride_fast, :dev_routes) do
     scope "/dev" do
       pipe_through [:fetch_session, :protect_from_forgery]
-
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

@@ -11,8 +11,8 @@ defmodule RideFastWeb.DriverController do
     render(conn, :index, drivers: drivers)
   end
 
-  def create(conn, %{"driver" => driver_params}) do
-    with {:ok, %Driver{} = driver} <- Accounts.create_driver(driver_params) do
+  def create(conn, params) when is_map(params) do
+    with {:ok, %Driver{} = driver} <- Accounts.create_driver(params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/drivers/#{driver}")
@@ -26,7 +26,7 @@ defmodule RideFastWeb.DriverController do
   end
 
   def update(conn, %{"id" => id} = driver_params) do
-    driver = Accounts.get_driver!(id)
+    driver = Accounts.get_driver_with_associations!(id)
 
     with {:ok, %Driver{} = driver} <- Accounts.update_driver(driver, driver_params) do
       render(conn, :show, driver: driver)

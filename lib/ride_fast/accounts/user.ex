@@ -9,6 +9,8 @@ defmodule RideFast.Accounts.User do
     field :password_hash, :string
     field :password, :string, virtual: true
 
+    has_many :rides, RideFast.Rides.Ride
+
     timestamps()
   end
 
@@ -17,7 +19,7 @@ defmodule RideFast.Accounts.User do
     |> cast(attrs, [:name, :email, :phone, :password])
     |> validate_required([:name, :email, :phone])
     |> validate_format(:email, ~r/@/)
-    |> unique_constraint(:email)
+    |> unique_constraint(:email, error: 409)
     |> validate_password?()
   end
 
@@ -32,7 +34,7 @@ defmodule RideFast.Accounts.User do
       nil -> changeset
       _password ->
         changeset
-        |> validate_length(:password, min: 6)
+        |> validate_length(:password, min: 8)
         |> put_password_hash()
     end
   end

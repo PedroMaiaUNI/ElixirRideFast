@@ -10,6 +10,10 @@ defmodule RideFast.Accounts.Driver do
     field :password_hash, :string
     field :password, :string, virtual: true
 
+    has_one :driver_profile, RideFast.Accounts.DriverProfile
+    has_many :vehicles, RideFast.Vehicles.Vehicle
+    many_to_many :languages, RideFast.Skills.Language, join_through: "drivers_languages"
+
     timestamps()
   end
 

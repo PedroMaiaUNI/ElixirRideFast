@@ -24,6 +24,13 @@ defmodule RideFastWeb.AuthController do
           |> json(%{message: "Motorista criado com sucesso.", id: driver.id, email: driver.email})
         end
 
+      "admin" ->
+        with {:ok, user} <- Accounts.create_user(params) do
+          conn
+          |> put_status(:created)
+          |> json(%{message: "Admin criado com sucesso.", id: user.id, email: user.email})
+        end
+
       _ ->
         conn
         |> put_status(:bad_request)

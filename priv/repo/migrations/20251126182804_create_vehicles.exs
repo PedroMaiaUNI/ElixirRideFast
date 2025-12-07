@@ -14,5 +14,6 @@ defmodule RideFast.Repo.Migrations.CreateVehicles do
     end
 
     create index(:vehicles, [:driver_id])
+    create unique_index(:vehicles, [:plate])
   end
 end

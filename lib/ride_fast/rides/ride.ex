@@ -17,6 +17,8 @@ defmodule RideFast.Rides.Ride do
     field :driver_id, :id
     field :vehicle_id, :id
 
+    has_many :ratings, RideFast.Ratings.Rating
+
     timestamps(type: :utc_datetime)
   end
 

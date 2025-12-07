@@ -34,7 +34,7 @@ defmodule RideFastWeb.RideController do
       end
     else
       conn
-      |> put_status(:forbidden)
+      |> put_status(:unauthorized)
       |> json(%{error: "Apenas passageiros podem pedir corridas."})
     end
   end

@@ -11,6 +11,6 @@ defmodule RideFast.Repo.Migrations.CreateDriverProfiles do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:driver_profiles, [:driver_id])
+    create unique_index(:driver_profiles, [:driver_id])
   end
 end

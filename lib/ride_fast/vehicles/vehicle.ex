@@ -19,6 +19,7 @@ defmodule RideFast.Vehicles.Vehicle do
     vehicle
     |> cast(attrs, [:driver_id, :plate, :model, :color, :seats, :active])
     |> validate_required([:driver_id, :plate, :model, :color, :seats, :active])
+    |> unique_constraint(:plate)
     |> foreign_key_constraint(:driver_id)
   end
 end

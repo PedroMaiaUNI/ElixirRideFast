@@ -320,15 +320,10 @@ defmodule RideFast.Accounts do
     Repo.get_by(DriverProfile, driver_id: driver_id)
   end
 
-  def create_driver_profile(attrs \\ %{}) do
-    %DriverProfile{}
-    |> DriverProfile.changeset(attrs)
-    |> Repo.insert()
+  def get_driver_with_associations!(id) do
+    Driver
+    |> Repo.get!(id)
+    |> Repo.preload([:driver_profile, :vehicles, :languages])
   end
 
-  def update_driver_profile(%DriverProfile{} = profile, attrs) do
-    profile
-    |> DriverProfile.changeset(attrs)
-    |> Repo.update()
-  end
 end

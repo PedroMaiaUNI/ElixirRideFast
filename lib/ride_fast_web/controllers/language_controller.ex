@@ -53,7 +53,7 @@ defmodule RideFastWeb.LanguageController do
       {:ok, _dl} ->
         conn
         |> put_status(:created)
-        |> json(%{message: "Language associated successfully"})
+        |> json(%{message: "Idioma associado com sucesso."})
 
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
@@ -63,7 +63,7 @@ defmodule RideFastWeb.LanguageController do
       {:error, _} ->
         conn
         |> put_status(:conflict)
-        |> json(%{error: "Failed to associate language. Check if IDs are valid or already associated."})
+        |> json(%{error: "Falha ao associar idioma. Verifique se esse idioma já foi adicionado."})
     end
   end
 
